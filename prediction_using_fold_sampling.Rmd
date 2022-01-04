@@ -6,9 +6,9 @@ output: pdf_document
 ---
 
 
-# Linear regression using folded samples runs faster, retains accuracy
+# Regression using sample summaries runs faster, retains accuracy
 
-Fold sampling is a way of reducing the total number of samples to a manageable number in order to run prediction algorithms on modern day machines. The folded samples are then unfolded to predict the full dataset.
+Summarising or Folding the samples is a way of reducing the total number of samples to a manageable number in order to run prediction algorithms on modern day machines. The folded samples are then unfolded to predict the full dataset.
 
 A way to fold the total number of samples while retaining the original sample structure is done via Generative Encoding (gcode):
 
@@ -22,8 +22,7 @@ https://github.com/AskExplain/gcode/tree/alpha_test_v2022.1
 
 
 # Total permutations :
-# total indicates the total number of features 
-# in the Satellite dataset (p = 36) multipled by the permutation number
+
 
 permutation_test_number <- 1000
 
@@ -33,7 +32,10 @@ permutation_test_number <- 1000
 
 
 
+
+
 # Run SVD decomposition of samples to a reduced sample space
+
 
 source("./decompose_sample_space.R")
 
@@ -47,6 +49,7 @@ source("./decompose_sample_space.R")
 
 # Run gcode encoding of samples to a reduced sample space
 
+
 source("./encode_sample_space.R")
 
 
@@ -57,18 +60,13 @@ source("./encode_sample_space.R")
 ```
 
 
-Boxplots of total mean absolute error and total runtime are plotted. Here, total indicates the sum of all permutations across all runs when each feature is chosen as the prediction variable.
+Boxplots of mean absolute error and runtime are plotted for every unique run of linear regression . 
 
-## Of great importance, the total runtime does not include the running of the SVD or gcode algorithms.
+## Of great importance, the runtime does not include the running of the SVD or gcode algorithms.
 
 ```{r Boxplots of total mean absolute error and runtime, fig.height = 5}
 
-# Total Mean Absolute Error
-
-
-
-
-
+# Mean Absolute Error
 
 
 boxplot(data.frame(gcode = total_mae.gcode,
@@ -77,7 +75,7 @@ boxplot(data.frame(gcode = total_mae.gcode,
                    linreg2 = total_mae.lreg.2), 
         outline = F,
         horizontal = T, 
-        main = "Total Mean Absolute Error")
+        main = "Mean Absolute Error distribution")
 
 
 
@@ -85,8 +83,7 @@ boxplot(data.frame(gcode = total_mae.gcode,
 
 
 
-# Total Runtime
-
+# Runtime
 
 
 
@@ -101,7 +98,7 @@ boxplot(data.frame(gcode = total_time.gcode,
                    linreg2 = total_time.lreg.2), 
         outline = F,
         horizontal = T, 
-        main = "Total Runtime")
+        main = "Runtime distribution")
 
 ```
 
