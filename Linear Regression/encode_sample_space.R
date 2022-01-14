@@ -14,6 +14,8 @@ total_time.gcode <- c()
 total_mae.lreg.2 <- c()
 total_time.lreg.2 <- c()
 
+total_cor.gcode <- c()
+
 for (i in 1:dim(Satellite[,-37])[2]){
   
   x <- as.matrix(Satellite[,-c(i,37)])
@@ -34,11 +36,13 @@ for (i in 1:dim(Satellite[,-37])[2]){
     train_ids <- sample(c(1:6435),ceiling(6435*0.8))
     
     a <- Sys.time()
-    yx_hat <- predict(lm( gcode.model$main.parameters$alpha[[1]][,train_ids]%*%y[train_ids,] ~ ., data = data.frame(x = gcode.model$main.parameters$alpha[[1]][,train_ids]%*%x[train_ids,])), newdata = data.frame(x = folded_x))
+    lm_yx_hat <- lm( gcode.model$main.parameters$alpha[[1]][,train_ids]%*%y[train_ids,] ~ ., data = data.frame(x = gcode.model$main.parameters$alpha[[1]][,train_ids]%*%x[train_ids,]))
+    yx_hat <- predict(lm_yx_hat, newdata = data.frame(x = folded_x))
     b <- Sys.time()
     
     c <- Sys.time()
-    y_hat <- predict(lm( y[train_ids,] ~ ., data = data.frame(x = x[train_ids,])), newdata = data.frame(x = x[-train_ids,]))
+    lm_y_hat <- lm( y[train_ids,] ~ ., data = data.frame(x = x[train_ids,]))
+    y_hat <- predict(lm_y_hat, newdata = data.frame(x = x[-train_ids,]))
     d <- Sys.time()
     
     total_time.lreg.2 <- c(total_time.lreg.2,d-c)
@@ -46,5 +50,9 @@ for (i in 1:dim(Satellite[,-37])[2]){
     
     total_mae.lreg.2 <- c(total_mae.lreg.2,mean(abs(y[-train_ids,] - y_hat)))
     total_mae.gcode <-  c(total_mae.gcode,mean(abs(y[-train_ids,] - (to_unfold_y%*%yx_hat)[-train_ids,])))
+  
+    
+    total_cor.gcode <- c(total_cor.gcode,cor(lm_y_hat$coefficients[-1],lm_yx_hat$coefficients[-1],method = "pearson"))
+    
   }
 }
